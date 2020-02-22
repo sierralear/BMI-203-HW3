@@ -51,6 +51,24 @@ def score(H):
     H_flip = np.flip(np.flip(H, 0), 1)
     return H_flip.max()
 
+def aligned_seq_score(alignment, match_score_similarity_matrix, similarity_matrix_index):
+    score = 0
+    flag = 0
+    for character in alignment:
+        if character == '-' and flag == 0: #it's the beginning of a gap
+            added_value = -10 #give it gap opening penalty
+            score = score + added_value
+            flag = 1 #show we're now in the midst of a gap
+        elif character == '-' and flag == 1: #we're in the middle of a gap
+            added_value = -4 #give it extension penalty
+            score = score + added_value
+            flag = 1 #show we're still in the midst of a gap
+        else: #in this case, we have a non-gap alignment, so give it the score specified in the similarity matrix
+            added_value = match_score_similarity_matrix[similarity_matrix_index[character], similarity_matrix_index[character]]
+            score = score + added_value
+            flag = 0 #we're not in a gap
+    return score
+
 
 #functions associated with ROC
 def return_threshold(similarity_matrix, GOC, EP, goal_TPR):
@@ -73,6 +91,33 @@ def find_FPR(threshold, similarity_matrix, GOC, EP):
     return FPR
 
 #optimization function
+def return_threshold_FPR(similarity_matrix, goal_FPR, negative_alignment_list):
+    neg_pairs_scores = []
+    for alignment in negative_alignment_list:
+        score = aligned_seq_score(alignment, similarity_matrix, similarity_matrix_index) #calculates the score matrix for two sequences
+        neg_pairs_scores.append(score) #finds the score from the score matrix and appends to list
+    neg_pairs_scores = np.array(neg_pairs_scores)
+    threshold = np.sort(neg_pairs_scores)[int(49 * (1 - goal_FPR))] #picks threshold as the score based on desired TPR
+    return threshold
+
+def find_TPR(threshold, similarity_matrix, positive_alignment_list):
+    pos_pairs_scores = []
+    for alignment in positive_alignment_list:
+        score = aligned_seq_score(alignment, similarity_matrix, similarity_matrix_index) #note all similarity matrix indices are the same
+        pos_pairs_scores.append(score)
+    TPR = (np.array(pos_pairs_scores) > threshold).mean()
+    return TPR
+
+def obj_value(sim_matrix, negative_alignment_list, positive_alignment_list):
+    TPRs = []
+    for goal_FPR in [0.0, 0.1, 0.2, 0.3]:
+        threshold = return_threshold_FPR(sim_matrix, goal_FPR, negative_alignment_list)
+        TPR = find_TPR(threshold, sim_matrix, positive_alignment_list)
+        TPRs.append(TPR)
+    TPRs = np.array(TPRs)
+    sum_TPR = TPRs.sum()
+    return sum_TPR
+
 def grad_descent(sim_matrix, negative_alignment_list, positive_alignment_list, learning_rate=0.1):
     sim_matrix = sim_matrix.astype(float)
     
