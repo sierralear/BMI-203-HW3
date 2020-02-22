@@ -83,6 +83,15 @@ pos_pairs_filelist = []
 with open('./Pospairs.txt', mode='r') as my_file:
     for line in my_file:
         pos_pairs_filelist.append(line.strip().split(' '))
+        
+def return_sequences(sequence_a_path, sequence_b_path):
+    with open (sequence_a_path, "r") as file: #creating string for sequence a from its filepath
+        a = file.read()
+        a = a[a.find("\n")+1:].replace('\n', '')
+    with open (sequence_b_path, "r") as file: #creating string for sequence b from its filepath
+        b = file.read()
+        b = b[b.find("\n")+1:].replace('\n', '')
+    return a, b #the two sequences I am going to compare/align using Smith-Waterman
 
 def return_threshold(similarity_matrix, GOC, EP, goal_TPR):
     pos_pairs_scores = []
