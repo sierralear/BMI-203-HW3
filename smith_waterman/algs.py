@@ -72,3 +72,31 @@ def find_FPR(threshold, similarity_matrix, GOC, EP):
     FPR = (np.array(neg_pairs_scores) > threshold).mean() #calculating the FPR by comparing all the scores to a threshold and averaging it
     return FPR
 
+#optimization function
+def grad_descent(sim_matrix, negative_alignment_list, positive_alignment_list, learning_rate=0.1):
+    sim_matrix = sim_matrix.astype(float)
+    
+    
+    AA_list = ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", 
+        "M", "F", "P", "S", "T", "W", "Y", "V", "B", "Z", "X", "x"]
+    
+    #updating the amino acids
+    for iterations in range(50): #I would generally use more iterations, but the algorithm takes awhile to run and I got improvement with only 50, so I'm going with it.
+        for AA in AA_list: #iterating through each--for ref, each "AA" refers to one of the values in matrix I'm trying to change
+            #Calculate partial derivative of each "diagnol value"
+            h=0.01 #small number to shift value of my matrix slightly
+            new_matrix = sim_matrix #creating copy of sim_matrix that I can add "h" to in order to calculate the loss function when one value of the matrix is changed slightly
+            new_matrix[similarity_matrix_index[AA], similarity_matrix_index[AA]] = new_matrix[similarity_matrix_index[AA], similarity_matrix_index[AA]] + h
+            new_value = obj_value(new_matrix, negative_alignment_list, positive_alignment_list)
+            new_cost = np.abs(4 - new_value) #value of loss function when one value of sim_matrix is shifted by small value "h"
+        
+            old_value = obj_value(sim_matrix, negative_alignment_list, positive_alignment_list)
+            old_cost = np.abs(4 - old_value) #value of loss function with current sim_matrix
+            p_derivative = (new_cost - old_cost)/h #calculation of partial derivative: dC/d(AA) = (L(AA + h) - L(AA))/h
+            
+            #my update: value = value - learning_rate * dC/d(AA)
+            sim_matrix[similarity_matrix_index[AA], similarity_matrix_index[AA]] = sim_matrix[similarity_matrix_index[AA], similarity_matrix_index[AA]] - learning_rate * p_derivative
+    
+    
+    return sim_matrix
+
