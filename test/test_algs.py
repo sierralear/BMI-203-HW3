@@ -1,4 +1,6 @@
+import itertools
 import numpy as np
+import os
 import smith_waterman #import algs
 
 def load_sim_matrix(name):
