@@ -79,6 +79,11 @@ def aligned_seq_score(alignment, match_score_similarity_matrix, similarity_matri
 
 
 #functions associated with ROC
+pos_pairs_filelist = []
+with open('./Pospairs.txt', mode='r') as my_file:
+    for line in my_file:
+        pos_pairs_filelist.append(line.strip().split(' '))
+
 def return_threshold(similarity_matrix, GOC, EP, goal_TPR):
     pos_pairs_scores = []
     for f in pos_pairs_filelist:
@@ -88,6 +93,11 @@ def return_threshold(similarity_matrix, GOC, EP, goal_TPR):
     pos_pairs_scores = np.array(pos_pairs_scores) #sorts list of scores in ascending order
     threshold = np.sort(pos_pairs_scores)[int(49 * (1 - goal_TPR))] #picks threshold as the score based on desired TPR
     return threshold
+
+neg_pairs_filelist = []
+with open('./Negpairs.txt', mode='r') as my_file:
+    for line in my_file:
+        neg_pairs_filelist.append(line.strip().split(' '))
 
 def find_FPR(threshold, similarity_matrix, GOC, EP):
     neg_pairs_scores = []
@@ -157,7 +167,9 @@ def grad_descent(sim_matrix, negative_alignment_list, positive_alignment_list, l
 
 ##################HERE IS WHERE THE ACTUAL TESTS BEGIN###############
 
+#loading in my similarity matrix
 BLOSUM50, BLOSUM50_i = load_sim_matrix("BLOSUM50")
+BLOSUM50, similarity_matrix_index = load_sim_matrix("BLOSUM50")
 
 def test_roc():
     ROC_TPR = np.array([0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1])
