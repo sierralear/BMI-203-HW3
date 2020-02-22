@@ -1,4 +1,6 @@
+import itertools
 import numpy as np
+import os
 
 #functions associated with SW
 def load_sim_matrix(name):
