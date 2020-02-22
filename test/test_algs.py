@@ -2,6 +2,9 @@ import numpy as np
 from smith_waterman import algs
 
 def test_roc():
+    return None
+
+def test_smithwaterman():
     BLOSUM50, BLOSUM50_i = load_sim_matrix("BLOSUM50")
     
 
@@ -16,9 +19,6 @@ def test_roc():
     bad_m = matrix(perfect_seq, bad_seq, BLOSUM50, BLOSUM50_i, 2, 3)
     string_bad, n_ = traceback(bad_m, bad_seq)
     assert string_bad == ""
-
-def test_smithwaterman():
-    return None
 
 def test_scoring():
     return None
