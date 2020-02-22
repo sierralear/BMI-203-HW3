@@ -1,5 +1,22 @@
 import numpy as np
-from smith_waterman import algs
+import smith_waterman #import algs
+
+def load_sim_matrix(name):
+    pathway = os.path.join('..', name) #on Github, needs to be changed to '..'
+    if name == 'BLOSUM50' or name == 'BLOSUM62':
+        sim_matrix = np.loadtxt(os.path.abspath(pathway), dtype=int, comments='#', skiprows=7)
+    elif name == 'MATIO':
+        sim_matrix = np.loadtxt(os.path.abspath(pathway), dtype=int, comments='#', skiprows=3)
+    else:
+        sim_matrix = np.loadtxt(os.path.abspath(pathway), dtype=int, comments='#', skiprows=10)
+        
+    AA_list = ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "I", "L", "K", 
+           "M", "F", "P", "S", "T", "W", "Y", "V", "B", "Z", "X", "x"]
+    similarity_matrix_index = {}
+    for i, aa in enumerate(AA_list):
+        similarity_matrix_index[aa] = i
+    
+    return sim_matrix, similarity_matrix_index
 
 BLOSUM50, BLOSUM50_i = load_sim_matrix("BLOSUM50")
 
