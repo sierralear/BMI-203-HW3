@@ -10,7 +10,7 @@ import smith_waterman
 
 #functions associated with SW
 def load_sim_matrix(name):
-    pathway = os.path.join('..', name) #on Github, needs to be changed to '..'
+    pathway = os.path.join('.', name) #on Github, needs to be changed to '..'?
     if name == 'BLOSUM50' or name == 'BLOSUM62':
         sim_matrix = np.loadtxt(os.path.abspath(pathway), dtype=int, comments='#', skiprows=7)
     elif name == 'MATIO':
